@@ -10,5 +10,4 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         attrs["password"] = make_password(attrs["password"])
-
         return attrs
