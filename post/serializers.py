@@ -1,18 +1,17 @@
 from rest_framework import serializers
-from user.serializers import UserSerializer
 from .models import Post, Comment
 
 
 class PostSerializer(serializers.ModelSerializer):
-    created_by = UserSerializer(read_only=True)
+    created_by = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Post
-        fields = ["id", "image", "caption", "created_by"]
+        fields = ["id", "image", "caption", 'tags', "created_by", 'active_comment', 'show_like_view']
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Comment
