@@ -3,4 +3,6 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
-    mobile = models.CharField(max_length=11, blank=True, null=True)
+    followers_count = models.IntegerField(default=0)
+    posts_count = models.IntegerField(default=0)
+    following_count = models.IntegerField(default=0)
