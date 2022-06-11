@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -27,7 +26,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -38,7 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework.authtoken',
+    # 'social_django',
+    # 'rest_social_auth',
     'rest_auth',
     'post',
     'scheduled_post',
@@ -79,7 +78,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'instagramProject.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
@@ -89,7 +87,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
@@ -109,7 +106,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -123,23 +119,20 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
-
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'guardian.backends.ObjectPermissionBackend',
-]
+# AUTHENTICATION_BACKENDS = [
+#     'django.contrib.auth.backends.ModelBackend',
+#     'guardian.backends.ObjectPermissionBackend',
+# ]
 AUTH_USER_MODEL = 'user.User'
 SILENCED_SYSTEM_CHECKS = ["auth.W004"]
 REST_FRAMEWORK = {
@@ -157,3 +150,13 @@ REST_FRAMEWORK = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'json'
 
 }
+# SOCIAL_AUTH_INSTAGRAM_KEY = 'your app client id'
+# SOCIAL_AUTH_INSTAGRAM_SECRET = 'your app client secret'
+# SOCIAL_AUTH_INSTAGRAM_SCOPE = ['email', ]  # optional
+# SOCIAL_AUTH_INSTAGRAM_PROFILE_EXTRA_PARAMS = {'locale': 'en_US'}  # optional
+
+# AUTHENTICATION_BACKENDS = (
+#     'social_core.backends.instagram.InstagramOAuth2',
+#     'django.contrib.auth.backends.ModelBackend',
+# )
+# REST_SOCIAL_OAUTH_REDIRECT_URI = '/oauth/redirect/path/'
