@@ -10,6 +10,13 @@ class PostSerializer(serializers.ModelSerializer):
         fields = ["id", "image", "caption", 'tags', "created_by", 'active_comment', 'show_like_view']
 
 
+class TimeLineSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Post
+        fields = ["id", "image", "caption", 'tags', "created_by"]
+
+
 class CommentSerializer(serializers.ModelSerializer):
     user = serializers.HiddenField(default=serializers.CurrentUserDefault())
 

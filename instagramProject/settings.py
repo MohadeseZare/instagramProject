@@ -36,14 +36,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    # 'social_django',
-    # 'rest_social_auth',
     'rest_auth',
+    'login',
     'post',
     'scheduled_post',
     'user',
     'main_setting',
-    'user_setting'
+    'user_setting',
+    'follow'
 
 ]
 
@@ -125,6 +125,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
@@ -133,15 +134,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #     'django.contrib.auth.backends.ModelBackend',
 #     'guardian.backends.ObjectPermissionBackend',
 # ]
+# REST_AUTH_SERIALIZERS = {
+#     'LOGIN_SERIALIZER': 'login.serializers.LoginSerializer',
+# }
 AUTH_USER_MODEL = 'user.User'
 SILENCED_SYSTEM_CHECKS = ["auth.W004"]
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
+    # 'DEFAULT_PERMISSION_CLASSES': (
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
@@ -150,13 +154,7 @@ REST_FRAMEWORK = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'json'
 
 }
-# SOCIAL_AUTH_INSTAGRAM_KEY = 'your app client id'
-# SOCIAL_AUTH_INSTAGRAM_SECRET = 'your app client secret'
-# SOCIAL_AUTH_INSTAGRAM_SCOPE = ['email', ]  # optional
-# SOCIAL_AUTH_INSTAGRAM_PROFILE_EXTRA_PARAMS = {'locale': 'en_US'}  # optional
 
-# AUTHENTICATION_BACKENDS = (
-#     'social_core.backends.instagram.InstagramOAuth2',
-#     'django.contrib.auth.backends.ModelBackend',
-# )
-# REST_SOCIAL_OAUTH_REDIRECT_URI = '/oauth/redirect/path/'
+CURRENT_USER_INSTAGRAM_USERNAME = 'test.zare'
+CURRENT_USER_INSTAGRAM_PASSWORD = '123Z456'
+INSTAGRAM_PATH_SETTING_FILE = os.path.join(BASE_DIR, 'setting')

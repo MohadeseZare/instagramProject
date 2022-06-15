@@ -21,10 +21,12 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('user.urls')),
+    path('follow/', include('follow.urls')),
     path('scheduled-post/', include('scheduled_post.urls')),
-    path('post/', include('post.urls')),
+    path('posts/', include('post.urls')),
     path('main-setting/', include('main_setting.urls')),
     path('user-setting/', include('user_setting.urls')),
+    path('login/', include('login.urls')),
     path('api-auth/', include('rest_framework.urls')),
 
 ]
