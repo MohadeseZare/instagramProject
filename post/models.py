@@ -17,5 +17,5 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.DO_NOTHING)
     instagram_comment_id = models.IntegerField(null=True)
     comment = models.TextField()
-    created_by = models.DateTimeField(auto_now_add=True)
-    created_at = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.DO_NOTHING)

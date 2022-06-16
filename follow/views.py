@@ -43,7 +43,7 @@ class FollowingViewSet(viewsets.ViewSet):
     def destroy(self, request, **kwargs):
         user_id = get_username_info(kwargs['username'])
         unfollow_user(user_id)
-        user = get_user_model().objects.filter(instagram_user_id=user_id)
+        user = get_user_model().objects.get(instagram_user_id=user_id)
         if user:
             relationship = Relationship.objects.filter(current_user=self.request.user,
                                                        target_user__in=user).delete()

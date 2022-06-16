@@ -117,3 +117,31 @@ def get_username_info(user_name):
 
 def unfollow_user(user_id):
     return api.friendships_destroy(user_id)
+
+
+def get_comments_media(media_id):
+    return api.media_comments(media_id, max_id=100)
+
+
+def post_comment_media(media_id, comment_text):
+    return api.post_comment(media_id, comment_text)
+
+
+def delete_comment_media(media_id, comment_id):
+    return api.delete_comment(media_id, comment_id)
+
+
+def media_like(media_id):
+    return api.post_like(media_id)
+
+
+def media_unlike(media_id):
+    return api.delete_like(media_id)
+
+
+def comment_like(comment_id):
+    return api.comment_like(comment_id)
+
+
+def comment_unlike(comment_id):
+    return api.comment_unlike(comment_id)

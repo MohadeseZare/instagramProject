@@ -1,16 +1,22 @@
 from django.urls import path
-from rest_framework.routers import DefaultRouter
+
 from .views import PostViewSet, TimelineViewSet, CommentViewSet
 
-router = DefaultRouter()
-router.register(r'', PostViewSet, basename='post')
-
 urlpatterns = [
-     # path("", PostViewSet.as_view({'get': 'list'}), name="post"),
+     # post event
+     path("", PostViewSet.as_view({'get': 'list'}), name="post"),
+     path("add/", PostViewSet.as_view({'post': 'create'}), name="new_post"),
+
+     # timeline event
      path("timeline/", TimelineViewSet.as_view({'get': 'list'}), name="timeline"),
-    # path("search", TimelineList.as_view(), name="search"),
-    # path("<int:pk>/", UpdatePost, name="update_post")
-    # path('<int:post_id>/comment/', CommentViewSet),
-    # path('<int:post_id>/comment/<int:comment_id>', CommentViewSet),
+     path('like/<int:post_id>/', TimelineViewSet.as_view({'get': 'like_post'})),
+     path('unlike/<int:post_id>/', TimelineViewSet.as_view({'get': 'unlike_post'})),
+
+     # comment event
+     path('comment/<int:post_id>/', CommentViewSet.as_view({'get': 'list'})),
+     path("comment/add/<int:post_id>", CommentViewSet.as_view({'post': 'create'}), name="new_comment"),
+     path("comment/deleted/<int:comment_id>/", CommentViewSet.as_view({'get': 'destroy'}), name="update_post"),
+     path('comment/like/<int:comment_id>/', CommentViewSet.as_view({'get': 'like_comment'})),
+     path('comment/unlike/<int:comment_id>/', CommentViewSet.as_view({'get': 'unlike_comment'})),
 ]
-urlpatterns += router.urls
+
