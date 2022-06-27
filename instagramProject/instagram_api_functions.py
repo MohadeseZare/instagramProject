@@ -1,3 +1,4 @@
+import hmac, urllib.request, hashlib, time
 import json
 import codecs
 import datetime
@@ -145,3 +146,58 @@ def comment_like(comment_id):
 
 def comment_unlike(comment_id):
     return api.comment_unlike(comment_id)
+
+
+def save_media(media_id):
+    return api.save_photo(media_id)
+
+
+# def user_info():
+#     x = api.news()
+#     y = api.news_inbox()
+#     return x, y
+
+
+# def upload(self, filename, description):
+#     # UPLOAD MEDIA
+#     self.data = {
+#         "device_timestamp": time.time(),
+#     }
+#     self.files = {
+#         "photo": open(filename, 'rb'),
+#     }
+#
+#     self.uploadResponse = self.session.post(self.uploadURL, self.data, files=self.files)
+#     # print "UPLOAD RESPONSE: ", self.uploadResponse.json()
+#
+#     self.media_id = self.uploadResponse.json().get("media_id")
+#     # print "MEDIA ID: ", self.media_id
+#
+#     # CONFIGURE MEDIA
+#     self.data = json.dumps({
+#         "device_id": self.device_id,
+#         "guid": self.guid,
+#         "media_id": self.media_id,
+#         "caption": description or "",
+#         "device_timestamp": time.time(),
+#         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+#     })
+#
+#     self.sig = hmac.new('b4a23f5e39b5929e0666ac5de94c89d1618a2916'.encode('utf-8'), self.data.encode('utf-8'),
+#                         hashlib.sha256).hexdigest()
+#     self.payload = 'signed_body={}.{}&ig_sig_key_version=4'.format(
+#         self.sig,
+#         urllib.request.quote(self.data)
+#     )
+#
+#     return self.session.post(self.configureURL, self.payload)
+
+# def post_photo(photo, caption, disable_comments):
+#     #      photo_data, photo_size = media.prepare_image(photo, aspect_ratios=MediaRatios.standard)
+#     width, height = get_image_dimensions(photo)
+#     im = Image.open(photo)
+#     buf = io.BytesIO()
+#     im.save(buf, format='JPEG')
+#     image_data = buf.getvalue()
+#     image_data = base64.encodebytes(photo.file.read())
+#     return api.post_photo(image_data, (width, height), caption=caption, disable_comments=disable_comments)

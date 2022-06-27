@@ -1,15 +1,14 @@
 from rest_framework import viewsets, permissions
 from django.db.models import Q
 from rest_framework.response import Response
-
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer, TimeLineSerializer
 from .permissions import IsOwnerOrReadOnly
 from user.models import User
 from follow.models import Relationship
 from instagramProject.instagram_api_functions import (get_user_feed, get_feed_timeline, get_comments_media,
-                                                      media_like, media_unlike, delete_comment_media
-                                                      ,comment_like,comment_unlike)
+                                                      media_like, media_unlike, delete_comment_media,
+                                                      comment_like, comment_unlike)
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -23,13 +22,11 @@ class PostViewSet(viewsets.ModelViewSet):
             if not Post.objects.filter(instagram_post_id=post_item['pk']).exclude():
                 Post.objects.create(instagram_post_id=post_item['pk'], created_by=self.request.user,
                                     caption=post_item['caption']['text'],
-                                    image=post_item['image_versions2']['candidates'][0]['url'])
+                                    media_file=post_item['image_versions2']['candidates'][0]['url'])
 
         self.request.user.posts_count = items.__len__()
         self.request.user.save()
         return Post.objects.filter(created_by=self.request.user)
-
-
 
 
 class TimelineViewSet(viewsets.ModelViewSet):
@@ -51,7 +48,7 @@ class TimelineViewSet(viewsets.ModelViewSet):
 
                 Post.objects.create(instagram_post_id=item['media_or_ad']['pk'], created_by=user,
                                     caption=item['media_or_ad']['caption']['text'],
-                                    image=" ")
+                                    media_file=" ")
         return Post.objects.filter(Q(created_by__target_user__current_user=self.request.user) |
                                    Q(created_by=self.request.user))
 
@@ -116,5 +113,3 @@ class CommentViewSet(viewsets.ModelViewSet):
         comment_unlike(comment.instagram_comment_id)
         serializer = CommentSerializer(comment)
         return Response(serializer.data)
-
-

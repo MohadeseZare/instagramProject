@@ -1,3 +1,4 @@
+
 from rest_framework import viewsets, permissions
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
@@ -45,8 +46,8 @@ class FollowingViewSet(viewsets.ViewSet):
         unfollow_user(user_id)
         user = get_user_model().objects.get(instagram_user_id=user_id)
         if user:
-            relationship = Relationship.objects.filter(current_user=self.request.user,
-                                                       target_user__in=user).delete()
+            relationship = Relationship.objects.get(current_user=self.request.user,
+                                                    target_user=user).delete()
         queryset = Relationship.objects.filter(current_user=self.request.user)
         serializer = RelationshipSerializer(queryset, many=True)
         return Response(serializer.data)

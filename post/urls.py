@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import PostViewSet, TimelineViewSet, CommentViewSet
+from .views import PostViewSet, CommentViewSet, TimelineViewSet
 
 urlpatterns = [
      # post event

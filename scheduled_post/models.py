@@ -2,7 +2,7 @@ from django.db import models
 
 
 class ScheduledPost(models.Model):
-    image = models.FileField(upload_to='posts/', null=True)
+    media_file = models.FileField(upload_to='posts/', null=True)
     caption = models.TextField(max_length=2200)
     tags = models.CharField(max_length=30, blank=True)
     creation_at = models.DateTimeField()

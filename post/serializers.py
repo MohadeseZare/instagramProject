@@ -2,19 +2,19 @@ from rest_framework import serializers
 from .models import Post, Comment
 from instagramProject.instagram_api_functions import post_comment_media
 
+
 class PostSerializer(serializers.ModelSerializer):
     created_by = serializers.HiddenField(default=serializers.CurrentUserDefault())
 
     class Meta:
         model = Post
-        fields = ["id", "image", "caption", 'tags', "created_by", 'active_comment', 'show_like_view']
+        fields = ["id", "media_file", "media_type", "caption", 'tags', "created_by", 'active_comment', 'show_like_view']
 
 
 class TimeLineSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Post
-        fields = ["id", "image", "caption", 'tags', "created_by"]
+        fields = ["id", "media_file", "media_type", "caption", 'tags', "created_by"]
 
 
 class CommentSerializer(serializers.ModelSerializer):
