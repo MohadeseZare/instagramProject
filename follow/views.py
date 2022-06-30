@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from .serializers import RelationshipSerializer
 from .models import Relationship
+from user.models import UserLog
+from user.serializers import UserLogSerializer
 from instagramProject.instagram_api_functions import (get_user_following, get_user_follows,
                                                       follow_user, get_username_info,
                                                       unfollow_user)

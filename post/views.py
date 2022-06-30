@@ -4,9 +4,8 @@ from rest_framework.response import Response
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer, TimeLineSerializer
 from .permissions import IsOwnerOrReadOnly
-from user.models import User
-from follow.models import Relationship
-from instagramProject.instagram_api_functions import (get_user_feed, get_feed_timeline, get_comments_media,
+from .helper import get_all_post_current_user, get_timeline, get_list_comment_by_post_id
+from instagramProject.instagram_api_functions import (get_comments_media,
                                                       media_like, media_unlike, delete_comment_media,
                                                       comment_like, comment_unlike)
 
@@ -16,17 +15,13 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
 
     def get_queryset(self):
-        results = get_user_feed()
-        items = [item for item in results.get('items', [])]
-        for post_item in items:
-            if not Post.objects.filter(instagram_post_id=post_item['pk']).exclude():
-                Post.objects.create(instagram_post_id=post_item['pk'], created_by=self.request.user,
-                                    caption=post_item['caption']['text'],
-                                    media_file=post_item['image_versions2']['candidates'][0]['url'])
-
-        self.request.user.posts_count = items.__len__()
-        self.request.user.save()
         return Post.objects.filter(created_by=self.request.user)
+
+    def list(self, request, **kwargs):
+        get_all_post_current_user(self.request.user)
+        queryset = Post.objects.filter(created_by=self.request.user)
+        serializer = PostSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class TimelineViewSet(viewsets.ModelViewSet):
@@ -34,21 +29,7 @@ class TimelineViewSet(viewsets.ModelViewSet):
     serializer_class = TimeLineSerializer
 
     def get_queryset(self):
-        results = get_feed_timeline()
-        items = [item for item in results.get('feed_items', [])
-                 if item.get('media_or_ad')]
-        for item in items:
-            if not Post.objects.filter(instagram_post_id=item['media_or_ad']['pk']).exclude():
-                user = User.objects.get(instagram_user_id=item['media_or_ad']['user']['pk'])
-                if not user:
-                    user = User.objects.create_user(username=item['media_or_ad']['user']['username'],
-                                                    instagram_user_id=item['media_or_ad']['user']['pk'])
-                    Relationship.objects.update_or_create(current_user=self.request.user,
-                                                          target_user=user)
-
-                Post.objects.create(instagram_post_id=item['media_or_ad']['pk'], created_by=user,
-                                    caption=item['media_or_ad']['caption']['text'],
-                                    media_file=" ")
+        get_timeline(self.request.user)
         return Post.objects.filter(Q(created_by__target_user__current_user=self.request.user) |
                                    Q(created_by=self.request.user))
 
@@ -75,21 +56,8 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
 
     def list(self, request, **kwargs):
-        post = Post.objects.get(id=kwargs['post_id'])
-        results = get_comments_media(post.instagram_post_id)
-        items = [item for item in results.get('comments', [])]
-        for item in items:
-
-            user = User.objects.get(instagram_user_id=item['user']['pk'])
-            if not user:
-                user = User.objects.create_user(username=item['user']['username'],
-                                                instagram_user_id=item['user']['pk'])
-            comment = Comment.objects.filter(instagram_comment_id=item['pk'])
-            if not comment:
-                Comment.objects.create(instagram_comment_id=item['pk'],
-                                       post=post, comment=item['text'], created_by=user)
-
-        queryset = Comment.objects.filter(post_id=post.id)
+        get_list_comment_by_post_id(kwargs['post_id'])
+        queryset = Comment.objects.filter(post_id=kwargs['post_id'])
         serializer = CommentSerializer(queryset, many=True)
         return Response(serializer.data)
 

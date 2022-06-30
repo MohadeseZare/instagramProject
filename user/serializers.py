@@ -1,7 +1,7 @@
 from django.contrib.auth.hashers import make_password
 from instagram_private_api import Client, ClientLoginError
 from rest_framework import serializers
-from .models import User
+from .models import User, UserLog
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -25,3 +25,8 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'password', 'email', 'followers_count', 'posts_count', 'following_count']
 
+
+class UserLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserLog
+        fields = '__all__'

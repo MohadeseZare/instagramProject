@@ -8,13 +8,15 @@ class PostSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ["id", "media_file", "media_type", "caption", 'tags', "created_by", 'active_comment', 'show_like_view']
+        fields = ["id", 'instagram_post_id', "media_file", "media_type", "caption", "tags", "created_by",
+                  "active_comment", "show_like_view", 'instagram_post_media_path']
 
 
 class TimeLineSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ["id", "media_file", "media_type", "caption", 'tags', "created_by"]
+        fields = ["id", 'instagram_post_id', "media_file", "media_type", "caption", "tags", "created_by",
+                  'instagram_post_media_path']
 
 
 class CommentSerializer(serializers.ModelSerializer):
