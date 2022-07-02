@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'scheduled_post',
     'user',
     'main_setting',
-    'user_setting',
     'follow'
 
 ]

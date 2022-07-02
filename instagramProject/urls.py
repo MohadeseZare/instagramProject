@@ -25,7 +25,6 @@ urlpatterns = [
     path('scheduled-post/', include('scheduled_post.urls')),
     path('posts/', include('post.urls')),
     path('main-setting/', include('main_setting.urls')),
-    path('user-setting/', include('user_setting.urls')),
     path('login/', include('login.urls')),
     path('api-auth/', include('rest_framework.urls')),
 

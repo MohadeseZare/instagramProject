@@ -5,6 +5,7 @@ from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer, TimeLineSerializer
 from .permissions import IsOwnerOrReadOnly
 from .helper import get_all_post_current_user, get_timeline, get_list_comment_by_post_id
+from follow.models import Relationship
 from instagramProject.instagram_api_functions import (get_comments_media,
                                                       media_like, media_unlike, delete_comment_media,
                                                       comment_like, comment_unlike)
@@ -15,11 +16,11 @@ class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
 
     def get_queryset(self):
-        return Post.objects.filter(created_by=self.request.user)
+        return Post.objects.filter(created_by=self.request.user.instagram_user_id)
 
     def list(self, request, **kwargs):
         get_all_post_current_user(self.request.user)
-        queryset = Post.objects.filter(created_by=self.request.user)
+        queryset = Post.objects.filter(created_by=self.request.user.instagram_user_id)
         serializer = PostSerializer(queryset, many=True)
         return Response(serializer.data)
 
@@ -29,23 +30,21 @@ class TimelineViewSet(viewsets.ModelViewSet):
     serializer_class = TimeLineSerializer
 
     def get_queryset(self):
-        get_timeline(self.request.user)
-        return Post.objects.filter(Q(created_by__target_user__current_user=self.request.user) |
-                                   Q(created_by=self.request.user))
+        get_timeline(self.request.user.instagram_user_id)
+        follower_query = Relationship.objects.filter(current_instagram_user_id=self.request.user.instagram_user_id)\
+            .values_list('target_instagram_user_id', flat=True)
+        return Post.objects.filter(Q(created_by__in=follower_query) |
+                                   Q(created_by=self.request.user.instagram_user_id))
 
     def like_post(self, request, **kwargs):
         post = Post.objects.get(id=kwargs['post_id'])
         media_like(post.instagram_post_id)
-        queryset = Post.objects.filter(Q(created_by__target_user__current_user=self.request.user) |
-                                       Q(created_by=self.request.user))
         serializer = PostSerializer(post)
         return Response(serializer.data)
 
     def unlike_post(self, request, **kwargs):
         post = Post.objects.get(id=kwargs['post_id'])
         media_unlike(post.instagram_post_id)
-        queryset = Post.objects.filter(Q(created_by__target_user__current_user=self.request.user) |
-                                       Q(created_by=self.request.user))
         serializer = PostSerializer(post)
         return Response(serializer.data)
 
