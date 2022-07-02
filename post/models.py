@@ -1,4 +1,5 @@
 from django.db import models
+import jsonfield
 from user.models import User
 
 
@@ -9,7 +10,7 @@ class Post(models.Model):
         CAROUSEL = '8'
 
     instagram_post_id = models.IntegerField(null=True, blank=True)
-    instagram_post_media_path = models.CharField(max_length=20000, null=True, blank=True)
+    instagram_post_media_path = jsonfield.JSONField(default=list)
     media_file = models.FileField(upload_to='posts/', null=True, blank=True)
     caption = models.TextField(max_length=2200)
     tags = models.CharField(max_length=30,  null=True, blank=True)

@@ -30,12 +30,12 @@ def get_timeline(current_instagram_user_id):
 
 
 def save_post(post_item):
-    path_media = ""
-    if post_item['media_type'] != 8:
-        path_media = post_item['image_versions2']['candidates'][0]['url']
+    # path_media = ""
+    # if post_item['media_type'] != 8:
+    #     path_media = post_item['image_versions2']['candidates'][0]['url']
     Post.objects.create(instagram_post_id=post_item['pk'], created_by=post_item['caption']['user_id'],
                         caption=post_item['caption']['text'],
-                        instagram_post_media_path=path_media)
+                        instagram_post_media_path=post_item['image_versions2']['candidates'])
 
 
 def get_list_comment_by_post_id(post_id):
