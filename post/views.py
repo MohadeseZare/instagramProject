@@ -1,6 +1,8 @@
 from rest_framework import viewsets, permissions
 from django.db.models import Q
 from rest_framework.response import Response
+
+from user.models import UserLog
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer, TimeLineSerializer
 from .permissions import IsOwnerOrReadOnly
@@ -39,12 +41,14 @@ class TimelineViewSet(viewsets.ModelViewSet):
     def like_post(self, request, **kwargs):
         post = Post.objects.get(id=kwargs['post_id'])
         media_like(post.instagram_post_id)
+        UserLog.objects.create(action=UserLog.Action.POST_LIKE)
         serializer = PostSerializer(post)
         return Response(serializer.data)
 
     def unlike_post(self, request, **kwargs):
         post = Post.objects.get(id=kwargs['post_id'])
         media_unlike(post.instagram_post_id)
+        UserLog.objects.create(action=UserLog.Action.POST_UNLIKE)
         serializer = PostSerializer(post)
         return Response(serializer.data)
 
@@ -66,17 +70,20 @@ class CommentViewSet(viewsets.ModelViewSet):
         if state['status'] == 'ok':
             comment.delete()
         queryset = Comment.objects.filter(post_id=comment.post.id)
+        UserLog.objects.create(action=UserLog.Action.COMMENT_DELETE)
         serializer = CommentSerializer(queryset, many=True)
         return Response(serializer.data)
 
     def like_comment(self, request, **kwargs):
         comment = Comment.objects.get(id=kwargs['comment_id'])
         comment_like(comment.instagram_comment_id)
+        UserLog.objects.create(action=UserLog.Action.COMMENT_LIKE)
         serializer = CommentSerializer(comment)
         return Response(serializer.data)
 
     def unlike_comment(self, request, **kwargs):
         comment = Comment.objects.get(id=kwargs['comment_id'])
         comment_unlike(comment.instagram_comment_id)
+        UserLog.objects.create(action=UserLog.Action.COMMENT_UNLIKE)
         serializer = CommentSerializer(comment)
         return Response(serializer.data)

@@ -1,10 +1,9 @@
 from rest_framework import viewsets, permissions
-from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from .serializers import RelationshipSerializer
 from .models import Relationship
+from .helper import ValidateFollower
 from user.models import UserLog
-from user.serializers import UserLogSerializer
 from instagramProject.instagram_api_functions import (get_user_following, get_user_follows,
                                                       follow_user, get_username_info,
                                                       unfollow_user)
@@ -26,22 +25,27 @@ class FollowingViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def create(self, request, **kwargs):
-        user_id = get_username_info(kwargs['username'])
-        following_state = follow_user(user_id)
-        if following_state['friendship_status']['following']:
-            Relationship.objects.update_or_create(current_instagram_user_id=self.request.user.instagram_user_id,
-                                                  target_instagram_user_id=user_id,
-                                                  instagram_username=kwargs['username'])
+        if ValidateFollower.validate_count_follows_per_hour(self.request.user)\
+                | ValidateFollower.validate_count_follows_per_day(self.request.user):
+            user_id = get_username_info(kwargs['username'])
+            following_state = follow_user(user_id)
+            if following_state['friendship_status']['following']:
+                Relationship.objects.update_or_create(current_instagram_user_id=self.request.user.instagram_user_id,
+                                                      target_instagram_user_id=user_id,
+                                                      instagram_username=kwargs['username'])
+                UserLog.objects.create(user=self.request.user, action=UserLog.Action.FOLLOW)
         queryset = Relationship.objects.filter(current_instagram_user_id=self.request.user.instagram_user_id)
         serializer = RelationshipSerializer(queryset, many=True)
         return Response(serializer.data)
 
     def destroy(self, request, **kwargs):
-        user_id = get_username_info(kwargs['username'])
-        unfollow_user(user_id)
+        if ValidateFollower.validate_count_unfollow(self.request.user):
+            user_id = get_username_info(kwargs['username'])
+            unfollow_user(user_id)
 
-        Relationship.objects.get(current_instagram_user_id=self.request.user.instagram_user_id,
-                                 target_instagram_user_id=user_id).delete()
+            Relationship.objects.get(current_instagram_user_id=self.request.user.instagram_user_id,
+                                     target_instagram_user_id=user_id).delete()
+            UserLog.objects.create(user=self.request.user, action=UserLog.Action.UNFOLLOW)
         queryset = Relationship.objects.filter(current_instagram_user_id=self.request.user.instagram_user_id)
         serializer = RelationshipSerializer(queryset, many=True)
         return Response(serializer.data)

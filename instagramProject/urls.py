@@ -13,10 +13,14 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls import url
 from django.contrib import admin
 from django.urls import include, path
 from django.conf.urls.static import static
 from django.conf import settings
+from rest_framework_swagger.views import get_swagger_view
+
+schema_view = get_swagger_view(title='instagram API')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,6 +31,7 @@ urlpatterns = [
     path('main-setting/', include('main_setting.urls')),
     path('login/', include('login.urls')),
     path('api-auth/', include('rest_framework.urls')),
+    url(r'^$', schema_view),
 
 ]
 

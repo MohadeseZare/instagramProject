@@ -36,7 +36,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'rest_auth',
+    'rest_framework_swagger',
     'login',
     'post',
     'scheduled_post',
@@ -61,7 +63,7 @@ ROOT_URLCONF = 'instagramProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates'
-        # , 'DIRS': [BASE_DIR / 'templates']
+        , 'DIRS': []
         ,
         'APP_DIRS': True,
         'OPTIONS': {
@@ -71,6 +73,9 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'libraries': {
+                'staticfiles': 'django.templatetags.static',
+            }
         },
     },
 ]
@@ -133,9 +138,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #     'django.contrib.auth.backends.ModelBackend',
 #     'guardian.backends.ObjectPermissionBackend',
 # ]
-# REST_AUTH_SERIALIZERS = {
-#     'LOGIN_SERIALIZER': 'login.serializers.LoginSerializer',
-# }
+REST_AUTH_SERIALIZERS = {
+    'LOGIN_SERIALIZER': 'login.serializers.LoginSerializer',
+}
 AUTH_USER_MODEL = 'user.User'
 SILENCED_SYSTEM_CHECKS = ["auth.W004"]
 REST_FRAMEWORK = {
@@ -150,7 +155,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
-    'TEST_REQUEST_DEFAULT_FORMAT': 'json'
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
 
 }
 

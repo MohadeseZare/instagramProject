@@ -35,6 +35,8 @@ class UserSettingSerializer(serializers.ModelSerializer):
 
 
 class UserLogSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
+
     class Meta:
         model = UserLog
         fields = '__all__'
