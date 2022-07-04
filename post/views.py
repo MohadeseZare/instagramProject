@@ -6,6 +6,7 @@ from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer, TimeLineSerializer
 from .permissions import IsOwnerOrReadOnly
 from .helper import get_all_post_current_user, get_timeline, get_list_comment_by_post_id
+from .validation import PostValidation
 from follow.models import Relationship
 from instagramProject.instagram_api_functions import InstagramAPI
 
@@ -38,18 +39,24 @@ class TimelineViewSet(viewsets.ModelViewSet):
                                    Q(created_by=self.request.user.instagram_user_id))
 
     def like_post(self, request, **kwargs):
-        post = Post.objects.get(id=kwargs['post_id'])
-        api.media_like(post.instagram_post_id)
-        UserLog.objects.create(action=UserLog.Action.POST_LIKE)
-        serializer = PostSerializer(post)
-        return Response(serializer.data)
+        if (PostValidation.validate_count_likes_per_day(self.request.user) &
+                PostValidation.validate_count_likes_per_hour(self.request.user)):
+            post = Post.objects.get(id=kwargs['post_id'])
+            api.media_like(post.instagram_post_id)
+            UserLog.objects.create(action=UserLog.Action.POST_LIKE)
+            follower_query = Relationship.objects.filter(current_instagram_user_id=self.request.user.instagram_user_id) \
+                .values_list('target_instagram_user_id', flat=True)
+        return Post.objects.filter(Q(created_by__in=follower_query) |
+                                   Q(created_by=self.request.user.instagram_user_id))
 
     def unlike_post(self, request, **kwargs):
         post = Post.objects.get(id=kwargs['post_id'])
         api.media_unlike(post.instagram_post_id)
         UserLog.objects.create(action=UserLog.Action.POST_UNLIKE)
-        serializer = PostSerializer(post)
-        return Response(serializer.data)
+        follower_query = Relationship.objects.filter(current_instagram_user_id=self.request.user.instagram_user_id) \
+            .values_list('target_instagram_user_id', flat=True)
+        return Post.objects.filter(Q(created_by__in=follower_query) |
+                                   Q(created_by=self.request.user.instagram_user_id))
 
 
 class CommentViewSet(viewsets.ModelViewSet):

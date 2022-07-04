@@ -26,7 +26,7 @@ class FollowingViewSet(viewsets.ViewSet):
 
     def create(self, request, **kwargs):
         if ValidateFollower.validate_count_follows_per_hour(self.request.user) \
-                | ValidateFollower.validate_count_follows_per_day(self.request.user):
+                & ValidateFollower.validate_count_follows_per_day(self.request.user):
             user_id = api.get_username_info(kwargs['username'])
             following_state = api.follow_user(user_id)
             if following_state['friendship_status']['following']:
