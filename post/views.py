@@ -43,16 +43,16 @@ class TimelineViewSet(viewsets.ModelViewSet):
                 PostValidation.validate_count_likes_per_hour(self.request.user)):
             post = Post.objects.get(id=kwargs['post_id'])
             api.media_like(post.instagram_post_id)
-            UserLog.objects.create(action=UserLog.Action.POST_LIKE)
-            follower_query = Relationship.objects.filter(current_instagram_user_id=self.request.user.instagram_user_id) \
-                .values_list('target_instagram_user_id', flat=True)
+            UserLog.objects.create(user=self.request.user, action=UserLog.Action.POST_LIKE)
+        follower_query = Relationship.objects.filter(current_instagram_user_id=self.request.user.instagram_user_id) \
+            .values_list('target_instagram_user_id', flat=True)
         return Post.objects.filter(Q(created_by__in=follower_query) |
                                    Q(created_by=self.request.user.instagram_user_id))
 
     def unlike_post(self, request, **kwargs):
         post = Post.objects.get(id=kwargs['post_id'])
         api.media_unlike(post.instagram_post_id)
-        UserLog.objects.create(action=UserLog.Action.POST_UNLIKE)
+        UserLog.objects.create(user=self.request.user, action=UserLog.Action.POST_UNLIKE)
         follower_query = Relationship.objects.filter(current_instagram_user_id=self.request.user.instagram_user_id) \
             .values_list('target_instagram_user_id', flat=True)
         return Post.objects.filter(Q(created_by__in=follower_query) |
@@ -76,20 +76,20 @@ class CommentViewSet(viewsets.ModelViewSet):
         if state['status'] == 'ok':
             comment.delete()
         queryset = Comment.objects.filter(post_id=comment.post.id)
-        UserLog.objects.create(action=UserLog.Action.COMMENT_DELETE)
+        UserLog.objects.create(user=self.request.user, action=UserLog.Action.COMMENT_DELETE)
         serializer = CommentSerializer(queryset, many=True)
         return Response(serializer.data)
 
     def like_comment(self, request, **kwargs):
         comment = Comment.objects.get(id=kwargs['comment_id'])
         api.comment_like(comment.instagram_comment_id)
-        UserLog.objects.create(action=UserLog.Action.COMMENT_LIKE)
+        UserLog.objects.create(user=self.request.user, action=UserLog.Action.COMMENT_LIKE)
         serializer = CommentSerializer(comment)
         return Response(serializer.data)
 
     def unlike_comment(self, request, **kwargs):
         comment = Comment.objects.get(id=kwargs['comment_id'])
         api.comment_unlike(comment.instagram_comment_id)
-        UserLog.objects.create(action=UserLog.Action.COMMENT_UNLIKE)
+        UserLog.objects.create(user=self.request.user, action=UserLog.Action.COMMENT_UNLIKE)
         serializer = CommentSerializer(comment)
         return Response(serializer.data)
