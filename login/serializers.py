@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers
 from django.conf import settings
 from user.models import User
-# from instagramProject.instagram_api_functions import login_instagram_api
+from instagramProject.instagram_api_functions import InstagramAPI
 
 
 class LoginSerializer(serializers.Serializer):
@@ -26,7 +26,7 @@ class LoginSerializer(serializers.Serializer):
                 if user.instagram_user_id:
                     settings.CURRENT_USER_INSTAGRAM_USERNAME = username
                     settings.CURRENT_USER_INSTAGRAM_PASSWORD = password
-                    # login_instagram_api(username, password)
+                    InstagramAPI()
 
             else:
                 msg = {'detail': 'Phone number is not registered.',

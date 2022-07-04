@@ -2,11 +2,11 @@ from rest_framework import viewsets, permissions
 from rest_framework.response import Response
 from .serializers import RelationshipSerializer
 from .models import Relationship
-from .helper import ValidateFollower
+from .validation import ValidateFollower
 from user.models import UserLog
-from instagramProject.instagram_api_functions import (get_user_following, get_user_follows,
-                                                      follow_user, get_username_info,
-                                                      unfollow_user)
+from instagramProject.instagram_api_functions import InstagramAPI
+
+api = InstagramAPI()
 
 
 class FollowingViewSet(viewsets.ViewSet):
@@ -14,7 +14,7 @@ class FollowingViewSet(viewsets.ViewSet):
     serializer_class = RelationshipSerializer
 
     def list(self, request):
-        results = get_user_following()
+        results = api.get_user_following()
         items = [item for item in results.get('users', [])]
         for item in items:
             Relationship.objects.update_or_create(current_instagram_user_id=self.request.user.instagram_user_id,
@@ -25,10 +25,10 @@ class FollowingViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def create(self, request, **kwargs):
-        if ValidateFollower.validate_count_follows_per_hour(self.request.user)\
+        if ValidateFollower.validate_count_follows_per_hour(self.request.user) \
                 | ValidateFollower.validate_count_follows_per_day(self.request.user):
-            user_id = get_username_info(kwargs['username'])
-            following_state = follow_user(user_id)
+            user_id = api.get_username_info(kwargs['username'])
+            following_state = api.follow_user(user_id)
             if following_state['friendship_status']['following']:
                 Relationship.objects.update_or_create(current_instagram_user_id=self.request.user.instagram_user_id,
                                                       target_instagram_user_id=user_id,
@@ -40,8 +40,8 @@ class FollowingViewSet(viewsets.ViewSet):
 
     def destroy(self, request, **kwargs):
         if ValidateFollower.validate_count_unfollow(self.request.user):
-            user_id = get_username_info(kwargs['username'])
-            unfollow_user(user_id)
+            user_id = api.get_username_info(kwargs['username'])
+            api.unfollow_user(user_id)
 
             Relationship.objects.get(current_instagram_user_id=self.request.user.instagram_user_id,
                                      target_instagram_user_id=user_id).delete()
@@ -56,7 +56,7 @@ class FollowersViewSet(viewsets.ModelViewSet):
     serializer_class = RelationshipSerializer
 
     def get_queryset(self, *args, **kwargs):
-        results = get_user_follows()
+        results = api.get_user_follows()
         items = [item for item in results.get('users', [])]
         for item in items:
             Relationship.objects.update_or_create(current_instagram_user_id=item['pk'],

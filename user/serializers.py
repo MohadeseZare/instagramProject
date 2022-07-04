@@ -1,15 +1,19 @@
+from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from instagram_private_api import Client, ClientLoginError
 from rest_framework import serializers
 from .models import User, UserLog, UserSetting
+from instagramProject.instagram_api_functions import InstagramAPI
 
 
 class UserSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         try:
-            api = Client(attrs["username"], attrs["password"], auto_patch=True)
-            user_id = api.authenticated_user_id
+            settings.CURRENT_USER_INSTAGRAM_USERNAME = attrs["username"]
+            settings.CURRENT_USER_INSTAGRAM_PASSWORD = attrs["password"]
+            api = InstagramAPI()
+            user_id = api.get_authenticated_user_id()
             user_instagram = api.user_info(user_id)
             attrs["followers_count"] = user_instagram['user']['follower_count']
             attrs["following_count"] = user_instagram['user']['following_count']
