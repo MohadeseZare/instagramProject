@@ -1,7 +1,10 @@
-from rest_framework.response import Response
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, generics
+from rest_framework.utils import json
+
 from .serializers import UserSerializer, UserSettingSerializer
 from .models import User, UserSetting
+from .helper import UserSettingHelper
+from main_setting.models import MainSetting
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -15,11 +18,17 @@ class UserViewSet(viewsets.ModelViewSet):
             return User.objects.filter(id=self.request.user.id)
 
 
-class UserSettingViewSet(viewsets.ModelViewSet):
+class UserSettingViewSet(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = UserSettingSerializer
 
-    def update(self, request, pk=None):
-        user_setting = UserSetting.objects.update_or_create(request.data, user=self.request.user)
-        serializer = UserSettingSerializer(user_setting)
-        return Response(serializer.data)
+    def get_object(self):
+        user_setting = UserSetting.objects.get(user=self.request.user)
+        return user_setting
+
+    def put(self, request, *args, **kwargs):
+        UserSettingHelper.checked_for_update_setting(request)
+        return self.update(request, *args, **kwargs)
+
+
+

@@ -3,7 +3,6 @@ from rest_framework import permissions
 
 from .serializers import LoginSerializer
 from rest_auth.views import LoginView as RestLoginView
-from user.models import User
 UserModel = get_user_model()
 
 
@@ -16,3 +15,4 @@ class LoginViewSet(RestLoginView):
         user = serializer.validated_data['user']
         login(request, user)
         return super().post(request, format=None)
+

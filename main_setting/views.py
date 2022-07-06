@@ -1,9 +1,15 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, generics
 from .models import MainSetting
 from .serializers import MainSettingSerializer
 
 
-class MainSettingViewSet(viewsets.ModelViewSet):
+class MainSettingViewSet(generics.RetrieveUpdateAPIView):
     permission_classes = [permissions.IsAdminUser]
-    queryset = MainSetting.objects.all()
     serializer_class = MainSettingSerializer
+
+    def get_object(self):
+        main_setting = MainSetting.objects.first()
+        return main_setting
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)

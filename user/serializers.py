@@ -22,7 +22,7 @@ class UserSerializer(serializers.ModelSerializer):
             attrs["instagram_password"] = attrs["password"]
             attrs["password"] = make_password(attrs["password"])
         except ClientLoginError:
-            raise ValueError("Wrong username or password")
+            raise ValueError("Wrong username or password.")
         return attrs
 
     class Meta:

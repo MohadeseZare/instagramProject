@@ -23,19 +23,18 @@ class LoginSerializer(serializers.Serializer):
             if User.objects.filter(username=username).exists():
                 user = authenticate(request=self.context.get('request'),
                                     username=username, password=password)
-                if user.instagram_user_id:
-                    settings.CURRENT_USER_INSTAGRAM_USERNAME = username
-                    settings.CURRENT_USER_INSTAGRAM_PASSWORD = password
-                    InstagramAPI()
+                if user:
+                    if user.instagram_user_id:
+                        settings.CURRENT_USER_INSTAGRAM_USERNAME = username
+                        settings.CURRENT_USER_INSTAGRAM_PASSWORD = password
+                        InstagramAPI()
 
             else:
-                msg = {'detail': 'Phone number is not registered.',
-                       'register': False}
+                msg = 'username is not registered.'
                 raise serializers.ValidationError(msg)
 
             if not user:
-                msg = {
-                    'detail': 'Unable to log in with provided credentials.', 'register': True}
+                msg = 'Unable to log in with provided credentials.'
                 raise serializers.ValidationError(msg, code='authorization')
 
         else:
