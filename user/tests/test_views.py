@@ -1,8 +1,8 @@
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from user.models import User, UserSetting
 from rest_framework import status
 from rest_framework.test import APITestCase
+from user.models import User, UserSetting
 from model_mommy import mommy
 
 
@@ -58,7 +58,6 @@ class UserViewTest(APITestCase):
     def test_user_setting_update(self):
         user = User.objects.create_user('client', get_user_model().objects.make_random_password())
         self.client.force_login(user)
-        user_setting = UserSetting.objects.get(user=user)
         data = {
             "id": user.id,
             "number_of_followers_per_hour": 5,
@@ -76,3 +75,215 @@ class UserViewTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         user_setting = UserSetting.objects.get(user=user)
         self.assertEqual(user_setting.number_of_followers_per_hour, data['number_of_followers_per_hour'])
+
+    def test_user_setting_number_of_followers_per_hour_update(self):
+        user = User.objects.create_user('client', get_user_model().objects.make_random_password())
+        self.client.force_login(user)
+        data = {
+            "id": user.id,
+            "number_of_followers_per_hour": 20,
+            "number_of_followers_per_day": 200,
+            "number_of_unfollowers_per_day": 70,
+            "number_of_likes_per_hour": 300,
+            "number_of_likes_per_day": 7000,
+            "number_of_comments_per_hour": 59,
+            "number_of_comments_per_day": 500,
+            "number_of_hashtags_used_in_the_post": 30,
+            "number_of_caption_words": 2200,
+            "number_of_comment_words": 240
+        }
+        response = self.client.put(reverse('user_setting'), data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(str(response.data[0]),
+                         'number of followers per hour more is main setting.')
+
+    def test_user_setting_number_of_followers_per_day_update(self):
+        user = User.objects.create_user('client', get_user_model().objects.make_random_password())
+        self.client.force_login(user)
+        data = {
+            "id": user.id,
+            "number_of_followers_per_hour": 10,
+            "number_of_followers_per_day": 250,
+            "number_of_unfollowers_per_day": 70,
+            "number_of_likes_per_hour": 300,
+            "number_of_likes_per_day": 7000,
+            "number_of_comments_per_hour": 59,
+            "number_of_comments_per_day": 500,
+            "number_of_hashtags_used_in_the_post": 30,
+            "number_of_caption_words": 2200,
+            "number_of_comment_words": 240
+        }
+        response = self.client.put(reverse('user_setting'), data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        UserSetting.objects.get(user=user)
+        self.assertEqual(str(response.data[0]),
+                         'number of followers per day more is main setting.')
+
+    def test_user_setting_number_of_unfollowers_per_day_update(self):
+        user = User.objects.create_user('client', get_user_model().objects.make_random_password())
+        self.client.force_login(user)
+        data = {
+            "id": user.id,
+            "number_of_followers_per_hour": 10,
+            "number_of_followers_per_day": 200,
+            "number_of_unfollowers_per_day": 100,
+            "number_of_likes_per_hour": 300,
+            "number_of_likes_per_day": 7000,
+            "number_of_comments_per_hour": 59,
+            "number_of_comments_per_day": 500,
+            "number_of_hashtags_used_in_the_post": 30,
+            "number_of_caption_words": 2200,
+            "number_of_comment_words": 240
+        }
+        response = self.client.put(reverse('user_setting'), data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(str(response.data[0]),
+                         'number of unfollowers per day more is main setting.')
+
+    def test_user_setting_number_of_likes_per_hour_update(self):
+        user = User.objects.create_user('client', get_user_model().objects.make_random_password())
+        self.client.force_login(user)
+        data = {
+            "id": user.id,
+            "number_of_followers_per_hour": 10,
+            "number_of_followers_per_day": 200,
+            "number_of_unfollowers_per_day": 70,
+            "number_of_likes_per_hour": 350,
+            "number_of_likes_per_day": 7000,
+            "number_of_comments_per_hour": 59,
+            "number_of_comments_per_day": 500,
+            "number_of_hashtags_used_in_the_post": 30,
+            "number_of_caption_words": 2200,
+            "number_of_comment_words": 240
+        }
+        response = self.client.put(reverse('user_setting'), data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        user_setting = UserSetting.objects.get(user=user)
+        self.assertEqual(str(response.data[0]),
+                         'number of likes per hour more is main setting.')
+
+    def test_user_setting_number_of_likes_per_day_update(self):
+        user = User.objects.create_user('client', get_user_model().objects.make_random_password())
+        self.client.force_login(user)
+        data = {
+            "id": user.id,
+            "number_of_followers_per_hour": 10,
+            "number_of_followers_per_day": 200,
+            "number_of_unfollowers_per_day": 70,
+            "number_of_likes_per_hour": 300,
+            "number_of_likes_per_day": 7100,
+            "number_of_comments_per_hour": 59,
+            "number_of_comments_per_day": 500,
+            "number_of_hashtags_used_in_the_post": 30,
+            "number_of_caption_words": 2200,
+            "number_of_comment_words": 240
+        }
+        response = self.client.put(reverse('user_setting'), data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(str(response.data[0]),
+                         'number of likes per day more is main setting.')
+
+    def test_user_setting_number_of_comments_per_hour_update(self):
+        user = User.objects.create_user('client', get_user_model().objects.make_random_password())
+        self.client.force_login(user)
+        data = {
+            "id": user.id,
+            "number_of_followers_per_hour": 10,
+            "number_of_followers_per_day": 200,
+            "number_of_unfollowers_per_day": 70,
+            "number_of_likes_per_hour": 300,
+            "number_of_likes_per_day": 7000,
+            "number_of_comments_per_hour": 60,
+            "number_of_comments_per_day": 500,
+            "number_of_hashtags_used_in_the_post": 30,
+            "number_of_caption_words": 2200,
+            "number_of_comment_words": 240
+        }
+        response = self.client.put(reverse('user_setting'), data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(str(response.data[0]),
+                         'number of comments per hour more is main setting.')
+
+    def test_user_setting_number_of_comments_per_day_update(self):
+        user = User.objects.create_user('client', get_user_model().objects.make_random_password())
+        self.client.force_login(user)
+        data = {
+            "id": user.id,
+            "number_of_followers_per_hour": 10,
+            "number_of_followers_per_day": 200,
+            "number_of_unfollowers_per_day": 70,
+            "number_of_likes_per_hour": 300,
+            "number_of_likes_per_day": 7000,
+            "number_of_comments_per_hour": 59,
+            "number_of_comments_per_day": 510,
+            "number_of_hashtags_used_in_the_post": 30,
+            "number_of_caption_words": 2200,
+            "number_of_comment_words": 240
+        }
+        response = self.client.put(reverse('user_setting'), data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(str(response.data[0]),
+                         'number of comments per day more is main setting.')
+
+    def test_user_setting_number_of_hashtags_used_in_the_post_update(self):
+        user = User.objects.create_user('client', get_user_model().objects.make_random_password())
+        self.client.force_login(user)
+        data = {
+            "id": user.id,
+            "number_of_followers_per_hour": 10,
+            "number_of_followers_per_day": 200,
+            "number_of_unfollowers_per_day": 70,
+            "number_of_likes_per_hour": 300,
+            "number_of_likes_per_day": 7000,
+            "number_of_comments_per_hour": 59,
+            "number_of_comments_per_day": 500,
+            "number_of_hashtags_used_in_the_post": 35,
+            "number_of_caption_words": 2200,
+            "number_of_comment_words": 240
+        }
+        response = self.client.put(reverse('user_setting'), data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(str(response.data[0]),
+                         'number of hashtags used in the post more is main setting.')
+
+    def test_user_setting_number_of_caption_words_update(self):
+        user = User.objects.create_user('client', get_user_model().objects.make_random_password())
+        self.client.force_login(user)
+        data = {
+            "id": user.id,
+            "number_of_followers_per_hour": 10,
+            "number_of_followers_per_day": 200,
+            "number_of_unfollowers_per_day": 70,
+            "number_of_likes_per_hour": 300,
+            "number_of_likes_per_day": 7000,
+            "number_of_comments_per_hour": 59,
+            "number_of_comments_per_day": 500,
+            "number_of_hashtags_used_in_the_post": 30,
+            "number_of_caption_words": 2220,
+            "number_of_comment_words": 240
+        }
+        response = self.client.put(reverse('user_setting'), data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(str(response.data[0]),
+                         'number of caption words more is main setting.')
+
+    def test_user_setting_number_of_comment_words_update(self):
+        user = User.objects.create_user('client', get_user_model().objects.make_random_password())
+        self.client.force_login(user)
+        data = {
+            "id": user.id,
+            "number_of_followers_per_hour": 10,
+            "number_of_followers_per_day": 200,
+            "number_of_unfollowers_per_day": 70,
+            "number_of_likes_per_hour": 300,
+            "number_of_likes_per_day": 7000,
+            "number_of_comments_per_hour": 59,
+            "number_of_comments_per_day": 500,
+            "number_of_hashtags_used_in_the_post": 30,
+            "number_of_caption_words": 2200,
+            "number_of_comment_words": 245
+        }
+        response = self.client.put(reverse('user_setting'), data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(str(response.data[0]),
+                         'number of comment words more is main setting.')

@@ -9,12 +9,13 @@ from .helper import get_all_post_current_user, get_timeline, get_list_comment_by
 from .validation import PostValidation
 from follow.models import Relationship
 from instagramProject.instagram_api_functions import InstagramAPI
+from instagramProject.permissions import InstagramPermission
 
 api = InstagramAPI()
 
 
 class PostViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsOwnerOrReadOnly]
+    permission_classes = [InstagramPermission]
     serializer_class = PostSerializer
 
     def get_queryset(self):
@@ -28,7 +29,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 class TimelineViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [InstagramPermission]
     serializer_class = TimeLineSerializer
 
     def get_queryset(self):
@@ -39,11 +40,11 @@ class TimelineViewSet(viewsets.ModelViewSet):
                                    Q(created_by=self.request.user.instagram_user_id))
 
     def like_post(self, request, **kwargs):
-        if (PostValidation.validate_count_likes_per_day(self.request.user) &
-                PostValidation.validate_count_likes_per_hour(self.request.user)):
-            post = Post.objects.get(id=kwargs['post_id'])
-            api.media_like(post.instagram_post_id)
-            UserLog.objects.create(user=self.request.user, action=UserLog.Action.POST_LIKE)
+        PostValidation.validate_count_likes_per_day(self.request.user)
+        PostValidation.validate_count_likes_per_hour(self.request.user)
+        post = Post.objects.get(id=kwargs['post_id'])
+        api.media_like(post.instagram_post_id)
+        UserLog.objects.create(user=self.request.user, action=UserLog.Action.POST_LIKE)
         follower_query = Relationship.objects.filter(current_instagram_user_id=self.request.user.instagram_user_id) \
             .values_list('target_instagram_user_id', flat=True)
         return Post.objects.filter(Q(created_by__in=follower_query) |
@@ -60,7 +61,7 @@ class TimelineViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [InstagramPermission]
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 

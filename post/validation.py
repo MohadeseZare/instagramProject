@@ -25,8 +25,6 @@ class PostValidation:
                                                  action_date__range=(today_min, today_max)).count()
         if user_setting.number_of_likes_per_day < count_like_post:
             raise ValidationError("You did 7000 likes today.")
-        else:
-            return True
 
     @staticmethod
     def validate_count_comment_per_hour(current_user):
@@ -37,8 +35,6 @@ class PostValidation:
                                                  action_date__gte=datetime.now()).count()
         if user_setting.number_of_comments_per_hour < count_like_post:
             raise ValidationError("You made 59 comments in the last 24 hours.")
-        else:
-            return True
 
     @staticmethod
     def validate_count_comment_per_day(current_user):
@@ -48,5 +44,3 @@ class PostValidation:
                                                  action_date__range=(today_min, today_max)).count()
         if user_setting.number_of_comments_per_day < count_like_post:
             raise ValidationError("You made 500 comments today")
-        else:
-            return True

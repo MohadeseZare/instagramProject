@@ -14,8 +14,6 @@ class ValidateFollower:
                                                    action_date__gte=datetime.now()).count()
         if user_setting.number_of_followers_per_hour < count_follow_user:
             raise ValidationError("You had 10 followers in the last 24 hours and you can't follow anymore.")
-        else:
-            return True
 
     @staticmethod
     def validate_count_follows_per_day(current_user):
@@ -25,8 +23,6 @@ class ValidateFollower:
                                                    action_date__range=(today_min, today_max)).count()
         if user_setting.number_of_followers_per_hour < count_follow_user:
             raise ValidationError("You have followed 200 times today, you can no longer follow.")
-        else:
-            return True
 
     @staticmethod
     def validate_count_unfollow(self, current_user):
@@ -36,5 +32,3 @@ class ValidateFollower:
                                                      action_date__range=(today_min, today_max)).count()
         if user_setting.number_of_unfollowers_per_day < count_unfollow_user:
             raise ValidationError("You have done 70 unfollows today, you can no longer follow.")
-        else:
-            return True
