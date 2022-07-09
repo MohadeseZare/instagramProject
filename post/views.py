@@ -11,8 +11,6 @@ from follow.models import Relationship
 from instagramProject.instagram_api_functions import InstagramAPI
 from instagramProject.permissions import InstagramPermission
 
-api = InstagramAPI()
-
 
 class PostViewSet(viewsets.ModelViewSet):
     permission_classes = [InstagramPermission]
@@ -40,6 +38,7 @@ class TimelineViewSet(viewsets.ModelViewSet):
                                    Q(created_by=self.request.user.instagram_user_id))
 
     def like_post(self, request, **kwargs):
+        api = InstagramAPI(self.request.user.username, self.request.user.instagram_password)
         PostValidation.validate_count_likes_per_day(self.request.user)
         PostValidation.validate_count_likes_per_hour(self.request.user)
         post = Post.objects.get(id=kwargs['post_id'])
@@ -51,6 +50,7 @@ class TimelineViewSet(viewsets.ModelViewSet):
                                    Q(created_by=self.request.user.instagram_user_id))
 
     def unlike_post(self, request, **kwargs):
+        api = InstagramAPI(self.request.user.username, self.request.user.instagram_password)
         post = Post.objects.get(id=kwargs['post_id'])
         api.media_unlike(post.instagram_post_id)
         UserLog.objects.create(user=self.request.user, action=UserLog.Action.POST_UNLIKE)
@@ -66,12 +66,13 @@ class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
 
     def list(self, request, **kwargs):
-        get_list_comment_by_post_id(kwargs['post_id'])
+        get_list_comment_by_post_id(kwargs['post_id'], self.request.user)
         queryset = Comment.objects.filter(post_id=kwargs['post_id'])
         serializer = CommentSerializer(queryset, many=True)
         return Response(serializer.data)
 
     def destroy(self, request, pk=None, **kwargs):
+        api = InstagramAPI(self.request.user.username, self.request.user.instagram_password)
         comment = Comment.objects.get(id=kwargs['comment_id'])
         state = api.delete_comment_media(comment.post.instagram_post_id, comment.instagram_comment_id)
         if state['status'] == 'ok':
@@ -82,6 +83,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def like_comment(self, request, **kwargs):
+        api = InstagramAPI(self.request.user.username, self.request.user.instagram_password)
         comment = Comment.objects.get(id=kwargs['comment_id'])
         api.comment_like(comment.instagram_comment_id)
         UserLog.objects.create(user=self.request.user, action=UserLog.Action.COMMENT_LIKE)
@@ -89,6 +91,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def unlike_comment(self, request, **kwargs):
+        api = InstagramAPI(self.request.user.username, self.request.user.instagram_password)
         comment = Comment.objects.get(id=kwargs['comment_id'])
         api.comment_unlike(comment.instagram_comment_id)
         UserLog.objects.create(user=self.request.user, action=UserLog.Action.COMMENT_UNLIKE)

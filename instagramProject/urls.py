@@ -31,7 +31,7 @@ urlpatterns = [
     path('main-setting/', include('main_setting.urls')),
     path('login/', include('login.urls')),
     path('api-auth/', include('rest_framework.urls')),
-    url(r'^$', schema_view),
+    url(r'docs/', schema_view),
 
 ]
 

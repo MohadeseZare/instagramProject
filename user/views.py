@@ -4,7 +4,6 @@ from rest_framework.utils import json
 from .serializers import UserSerializer, UserSettingSerializer
 from .models import User, UserSetting
 from .helper import UserSettingHelper
-from main_setting.models import MainSetting
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -26,9 +25,10 @@ class UserSettingViewSet(generics.RetrieveUpdateAPIView):
         user_setting = UserSetting.objects.get(user=self.request.user)
         return user_setting
 
+    def get_queryset(self):
+        user_setting = UserSetting.objects.get(user=self.request.user)
+        return user_setting
+
     def put(self, request, *args, **kwargs):
         UserSettingHelper.checked_for_update_setting(request)
         return self.update(request, *args, **kwargs)
-
-
-

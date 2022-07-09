@@ -1,16 +1,23 @@
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-
+from django.test.client import RequestFactory
+from django.test import Client
 from user.models import User
 
 
 class FollowViewTest(APITestCase):
     def setUp(self):
-        data = {'username': 'test.zare', 'password': '123Z456'}
-        self.client.post(reverse('user-list'), data)
-        self.user = User.objects.get(username='test.zare')
-        self.client.force_authenticate(self.user)
+        # data = {'username': 'test.zare', 'password': '123Z456'}
+        # self.client.post(reverse('user-list'), data)
+        # self.user = User.objects.get(username='test.zare')
+        c = Client()
+        # response = c.post('/login/', {'username': 'test.zare', 'password': '123Z456'})
+        response = self.client.post('/login/', {'username': 'test.zare', 'password': '123Z456'})
+        # self.factory = RequestFactory()
+        # request = self.factory.post('/login/', data)
+
+        # self.client.force_authenticate(self.user)
 
     def test_new_follow(self):
         response = self.client.post(reverse('follow', kwargs={'username': 'radiowland'}))

@@ -10,9 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         try:
-            settings.CURRENT_USER_INSTAGRAM_USERNAME = attrs["username"]
-            settings.CURRENT_USER_INSTAGRAM_PASSWORD = attrs["password"]
-            api = InstagramAPI()
+            api = InstagramAPI(attrs["username"], attrs["password"])
             user_id = api.get_authenticated_user_id()
             user_instagram = api.user_info(user_id)
             attrs["followers_count"] = user_instagram['user']['follower_count']

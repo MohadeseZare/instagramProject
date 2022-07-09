@@ -27,7 +27,7 @@ class CommentSerializer(serializers.ModelSerializer):
         if PostValidation.validate_count_comment_per_day(self.context['request'].user) & \
                 PostValidation.validate_count_comment_per_hour(self.context['request'].user):
             post = Post.objects.get(id=self.context['view'].kwargs['post_id'])
-            api = InstagramAPI()
+            api = InstagramAPI(self.context['request'].user.username, self.context['request'].user.instagram_password)
             comment_insta = api.post_comment_media(post.instagram_post_id, attrs['comment'])
             UserLog.objects.create(action=UserLog.Action.COMMENT, user=self.context['request'].user)
             attrs['post'] = post

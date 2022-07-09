@@ -6,7 +6,6 @@ from .validation import ValidateFollower
 from user.models import UserLog
 from instagramProject.instagram_api_functions import InstagramAPI
 from instagramProject.permissions import InstagramPermission
-api = InstagramAPI()
 
 
 class FollowingViewSet(viewsets.ViewSet):
@@ -14,6 +13,7 @@ class FollowingViewSet(viewsets.ViewSet):
     serializer_class = RelationshipSerializer
 
     def list(self, request):
+        api = InstagramAPI(self.request.user.username, self.request.user.instagram_password)
         results = api.get_user_following()
         items = [item for item in results.get('users', [])]
         for item in items:
@@ -25,6 +25,7 @@ class FollowingViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def create(self, request, **kwargs):
+        api = InstagramAPI(self.request.user.username, self.request.user.instagram_password)
         ValidateFollower.validate_count_follows_per_hour(self.request.user)
         ValidateFollower.validate_count_follows_per_day(self.request.user)
         user_id = api.get_username_info(kwargs['username'])
@@ -39,6 +40,7 @@ class FollowingViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
     def destroy(self, request, **kwargs):
+        api = InstagramAPI(self.request.user.username, self.request.user.instagram_password)
         ValidateFollower.validate_count_unfollow(self.request.user)
         user_id = api.get_username_info(kwargs['username'])
         api.unfollow_user(user_id)
@@ -56,6 +58,7 @@ class FollowersViewSet(viewsets.ModelViewSet):
     serializer_class = RelationshipSerializer
 
     def get_queryset(self, *args, **kwargs):
+        api = InstagramAPI(self.request.user.username, self.request.user.instagram_password)
         results = api.get_user_follows()
         items = [item for item in results.get('users', [])]
         for item in items:

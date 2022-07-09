@@ -43,7 +43,7 @@ def onlogin_callback(api, new_settings_file):
 
 
 class InstagramAPI:
-    def __init__(self):
+    def __init__(self, username, password):
         logging.basicConfig()
         logger = logging.getLogger('instagram_private_api')
         logger.setLevel(logging.WARNING)
@@ -58,7 +58,7 @@ class InstagramAPI:
 
                 # login new
                 self.api = Client(
-                    settings.CURRENT_USER_INSTAGRAM_USERNAME, settings.CURRENT_USER_INSTAGRAM_PASSWORD,
+                    username, password,
                     on_login=lambda x: onlogin_callback(x, settings.INSTAGRAM_PATH_SETTING_FILE))
             else:
                 with open(settings_file) as file_data:
@@ -68,7 +68,7 @@ class InstagramAPI:
                 device_id = cached_settings.get('device_id')
                 # reuse auth settings
                 self.api = Client(
-                    settings.CURRENT_USER_INSTAGRAM_USERNAME, settings.CURRENT_USER_INSTAGRAM_PASSWORD,
+                    username, password,
                     settings=cached_settings)
 
         except (ClientCookieExpiredError, ClientLoginRequiredError) as e:
@@ -77,7 +77,7 @@ class InstagramAPI:
             # Login expired
             # Do relogin but use default ua, keys and such
             self.api = Client(
-                settings.CURRENT_USER_INSTAGRAM_USERNAME, settings.CURRENT_USER_INSTAGRAM_PASSWORD,
+                username, password,
                 device_id=device_id,
                 on_login=lambda x: onlogin_callback(x, settings.INSTAGRAM_PATH_SETTING_FILE))
 

@@ -25,9 +25,7 @@ class LoginSerializer(serializers.Serializer):
                                     username=username, password=password)
                 if user:
                     if user.instagram_user_id:
-                        settings.CURRENT_USER_INSTAGRAM_USERNAME = username
-                        settings.CURRENT_USER_INSTAGRAM_PASSWORD = password
-                        InstagramAPI()
+                        InstagramAPI(username, password)
 
             else:
                 msg = 'username is not registered.'

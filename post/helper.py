@@ -1,12 +1,12 @@
 from django.db.models import Q
 from follow.models import Relationship
 from .models import Post, Comment
+from user.models import User
 from instagramProject.instagram_api_functions import InstagramAPI
-
-api = InstagramAPI()
 
 
 def get_all_post_current_user(current_user):
+    api = InstagramAPI(current_user.username, current_user.instagram_password)
     results = api.get_user_feed()
     items = [item for item in results.get('items', [])]
     for post_item in items:
@@ -18,6 +18,8 @@ def get_all_post_current_user(current_user):
 
 
 def get_timeline(current_instagram_user_id):
+    user = User.objects.get(instagram_user_id=current_instagram_user_id)
+    api = InstagramAPI(user.username, user.instagram_password)
     results = api.get_feed_timeline()
     items = [item for item in results.get('feed_items', [])
              if item.get('media_or_ad')]
@@ -37,7 +39,8 @@ def save_post(post_item):
                         instagram_post_media_path=post_item['image_versions2']['candidates'])
 
 
-def get_list_comment_by_post_id(post_id):
+def get_list_comment_by_post_id(post_id, current_user):
+    api = InstagramAPI(current_user.username, current_user.instagram_password)
     post = Post.objects.get(id=post_id)
     results = api.get_comments_media(post.instagram_post_id)
     items = [item for item in results.get('comments', [])]
@@ -46,7 +49,3 @@ def get_list_comment_by_post_id(post_id):
         if not comment:
             Comment.objects.create(instagram_comment_id=item['pk'],
                                    post=post, comment=item['text'], created_by=item['user']['pk'])
-
-
-
-

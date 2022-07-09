@@ -147,9 +147,6 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
-    # 'DEFAULT_PERMISSION_CLASSES': (
-    #     'rest_framework.permissions.IsAuthenticated',
-    # ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
@@ -160,6 +157,4 @@ REST_FRAMEWORK = {
 
 }
 
-CURRENT_USER_INSTAGRAM_USERNAME = 'test.zare'
-CURRENT_USER_INSTAGRAM_PASSWORD = '123Z456'
 INSTAGRAM_PATH_SETTING_FILE = os.path.join(BASE_DIR, 'setting')
